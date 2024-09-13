@@ -8,16 +8,12 @@
     Controls: Use arrow keys to select the operations!
 */
 
-// TODO-ING:
-// On-screen game instructions
-// simple sounds
-// test it!!
 
-import { setCanvasPixelated, vec2, Sound, rgb, drawText, engineInit, Color, keyWasPressed, setShowWatermark, drawRect } from "littlejsengine";
+import { setCanvasPixelated, vec2, Sound, drawText, engineInit, Color, keyWasPressed, setShowWatermark, drawRect } from "littlejsengine";
 import { startGameRound } from "./helpers";
-import { OPERATION_TYPE } from "./types";
+import { GameRound, Operation, OPERATION_TYPE } from "./types";
 import { COLOR_PALETTE, DIFFICULTY, GAME_STATE } from "./constants";
-import { renderBackground, renderInstructions, renderLevel } from "./render-functions";
+import { renderBackground, renderInstructions, renderLevel, renderMaxLevel } from "./render-functions";
 
 // do not use pixelated rendering
 setCanvasPixelated(false);
@@ -26,33 +22,21 @@ setShowWatermark(false);
 
 
 // sound effects
-const sound_goodMove = new Sound([.4,.2,250,.04,,.04,,,1,,,,,3]);
-const sound_badMove = new Sound([,,700,,,.07,,,,3.7,,,,3,,,.1]);
-const sound_fall = new Sound([.2,,1900,,,.01,,1.4,,91,,,,,,,,,,.7]);
+const sound_goodMove = new Sound([,0,349.2282]);
+const sound_badMove = new Sound([,0,146.8324,,,.5,,.3,,,,,,,,,,,.2]);
 
-// tiles
-const tileColors = 
-[
-    rgb(1,0,0),
-    rgb(1,1,1),
-    rgb(1,1,0),
-    rgb(0,1,0),
-    rgb(0,.6,1),
-    rgb(.6,0,1),
-    rgb(.5,.5,.5),
-];
-
-// ***********
-  let gameRound;
-  let addOperand;
-  let subOperand;
-  let divOperand;
-  let mulOperand;
+// ***********game variables************
+  let gameRound: GameRound;
+  let addOperand: number;
+  let subOperand: number;
+  let divOperand: number;
+  let mulOperand: number;
   let gameState = GAME_STATE.PLAYING;
   let level = 1;
-// ***********
+  let maxLevel = localStorage.getItem("maxLevel");
+// *************************************
 
-const createOperands = gameRound => {
+const createOperands = (gameRound: GameRound) => {
   gameRound.sequence.forEach(op => {
     if (op.type === OPERATION_TYPE.ADD) {
       addOperand = op.value;
@@ -74,6 +58,7 @@ const resetOperands = () => {
 };
 
 const resetGame = () => {
+  maxLevel = localStorage.getItem("maxLevel");
   let currentDifficulty = DIFFICULTY.easy;
   if (level > 10) {
     currentDifficulty = DIFFICULTY.hard;
@@ -87,11 +72,15 @@ const resetGame = () => {
 };
 
 const nextLevel = () => {
-  level += 1;
+  if (level !== 12) {
+    level += 1;
+  } else {
+    level = level + 2;
+  }
   resetGame();
 }
 
-const updateCurrentResult = (op) => {
+const updateCurrentResult = (op: Operation) => {
   if (op.type === OPERATION_TYPE.ADD) {
     gameRound.initialNumber += op.value;
   } else if (op.type === OPERATION_TYPE.SUB) {
@@ -106,7 +95,6 @@ const updateCurrentResult = (op) => {
 function gameInit()
 {
   gameRound = startGameRound();
-  console.log("gameRound", gameRound);
   createOperands(gameRound);
 }
 
@@ -119,11 +107,16 @@ function gameUpdate()
       resetOperands();
       createOperands(gameRound);
       updateCurrentResult(op);
+      sound_goodMove.play();
       if (gameRound.sequence.length === 0) {
         gameState = GAME_STATE.WIN;
       }
     } else {
       gameState = GAME_STATE.LOSE;
+      sound_badMove.play();
+      if (level > Number(maxLevel)) {
+        localStorage.setItem("maxLevel", String(level));
+      }
     }
   }
 
@@ -143,16 +136,17 @@ function gameUpdate()
   }}
 }
 
-function gameUpdatePost()
-{
-
-}
+function gameUpdatePost(){}
 
 function gameRender()
 {
   renderBackground();
 
   renderLevel(level);
+
+  if (maxLevel) {
+    renderMaxLevel(maxLevel);
+  }
 
   if (gameState === GAME_STATE.WIN) {
     drawRect(vec2(-0.05, 0), vec2(1.7, 1.7), COLOR_PALETTE.GREEN);
@@ -163,25 +157,25 @@ function gameRender()
 
   if (addOperand) {
     drawText("+", vec2(0, 2), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
-    drawText(addOperand, vec2(0, 4), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
+    drawText(String(addOperand), vec2(0, 4), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
     drawRect(vec2(0, 4), vec2(1.7, 1.7), COLOR_PALETTE.ORANGE);
   }
   
   if (subOperand) {
     drawText("-", vec2(0, -2), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
-    drawText(subOperand, vec2(0, -4), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
+    drawText(String(subOperand), vec2(0, -4), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
     drawRect(vec2(0, -4), vec2(1.7, 1.7), COLOR_PALETTE.ORANGE);
   }
   
   if (mulOperand) {
     drawText("x", vec2(2, 0), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
-    drawText(mulOperand, vec2(4, 0), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
+    drawText(String(mulOperand), vec2(4, 0), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
     drawRect(vec2(4, 0), vec2(1.7, 1.7), COLOR_PALETTE.ORANGE);
   }
   
   if (divOperand) {
     drawText("/", vec2(-2, 0), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
-    drawText(divOperand, vec2(-4, 0), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
+    drawText(String(divOperand), vec2(-4, 0), 1, COLOR_PALETTE.WHITE, 2, COLOR_PALETTE.TRANSPARENT);
     drawRect(vec2(-4, 0), vec2(1.7, 1.7), COLOR_PALETTE.ORANGE);
   }
 
@@ -201,9 +195,7 @@ function gameRender()
   }
 }
 
-function gameRenderPost()
-{
-}
+function gameRenderPost(){}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Startup LittleJS Engine

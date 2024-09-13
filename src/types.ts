@@ -11,3 +11,8 @@ export interface Operation {
 }
 
 export type OperationSequence = Operation[];
+
+export interface GameRound {
+    initialNumber: number;
+    sequence: OperationSequence;
+}
