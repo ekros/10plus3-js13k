@@ -9,3 +9,7 @@ You have a starting number in the center. Select the operations using the arrow 
 Hopefully it will help with your phobia!
 
 (Don't try to finish the game... levels are generated so it would never end :))
+
+Postmortem: I finished the game... but I couldn't submit it to the competition because the build system of the boilerplate I was using was broken. The zipped game did not work :) I waited until the last minute to submit and I had no time to fix this. For the next year: make sure your build system works!!
+
+You can still play the game if you clone the repo and type: `npm run start`.
