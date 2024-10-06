@@ -9,7 +9,7 @@
 */
 
 
-import { setCanvasPixelated, vec2, Sound, drawText, engineInit, Color, keyWasPressed, setShowWatermark, drawRect } from "littlejsengine";
+import { setCanvasPixelated, vec2, Sound, drawText, engineInit, keyWasPressed, setShowWatermark, drawRect } from "littlejsengine";
 import { startGameRound } from "./helpers";
 import { GameRound, Operation, OPERATION_TYPE } from "./types";
 import { COLOR_PALETTE, DIFFICULTY, GAME_STATE } from "./constants";
@@ -185,11 +185,9 @@ function gameRender()
 
   switch (gameState) {
     case GAME_STATE.WIN:
-        const successColor = new Color();
         drawText("Correct! Press enter to continue...", vec2(0, 6), 1, COLOR_PALETTE.GREEN, 2, COLOR_PALETTE.TRANSPARENT);
       break;
       case GAME_STATE.LOSE:
-        const errorColor = new Color();
         drawText("Wrong! Press enter to continue...", vec2(0, 6), 1, COLOR_PALETTE.RED, 2, COLOR_PALETTE.TRANSPARENT);
     break;
   }

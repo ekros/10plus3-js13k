@@ -1,4 +1,4 @@
-import { Color, drawRect, drawText, mainCanvas, vec2 } from "littlejsengine"
+import { drawRect, drawText, mainCanvas, vec2 } from "littlejsengine"
 import { COLOR_PALETTE } from "./constants"
 
 export const renderBackground = () => {
