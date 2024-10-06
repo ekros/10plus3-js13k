@@ -5,9 +5,11 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "start": "parcel ./index.html"
+    "start": "parcel ./src/index.html",
+    "build": "parcel build ./src/index.html --no-scope-hoist"
   },
   "devDependencies": {
+    "parcel": "^2.12.0",
     "typescript": "^5.4.0"
   },
   "dependencies": {
